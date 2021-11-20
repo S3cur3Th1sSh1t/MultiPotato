@@ -4,8 +4,8 @@ First of all - credit to [@splinter_code](https://twitter.com/splinter_code) & [
 
 This is just another Potato to get SYSTEM via SeImpersonate privileges. But this one is different in terms of 
 
-* ### It doesn't contain any SYSTEM auth trigger for weaponization. Instead the code can be used to integrate your favorite trigger by yourself.
-* ### It's not only using `CreateProcessWithTokenW` to spawn a new process. Instead you can choose between `CreateProcessWithTokenW`, `CreateProcessAsUserW`, `CreateUser` and `BindShell`.
+* It doesn't contain any SYSTEM auth trigger for weaponization. Instead the code can be used to integrate your favorite trigger by yourself.
+* It's not only using `CreateProcessWithTokenW` to spawn a new process. Instead you can choose between `CreateProcessWithTokenW`, `CreateProcessAsUserW`, `CreateUser` and `BindShell`.
 
 So this project is able to open up a NamedPipe Server, impersonate any user connecting to it and afterwards doing the users option mentioned above. If any new SYSTEM auth triggers are published in the future this tool can still be used to elevate privileges - you just need to use another Pipe-Name in this case.
 
@@ -25,7 +25,7 @@ c:\temp\MultiPotato> PetitPotamModified.exe localhost/pipe/pwned localhost
 
 Using `PetitPotam.py` as trigger from a remote system with a valid low privileged user is of course also possible.
 
-![alt text](https://raw.githubusercontent.com/S3cur3Th1sSh1t/MultiPotato/master/Images/CreateUser.PNG)
+![alt text](https://github.com/S3cur3Th1sSh1t/MultiPotato/raw/main/Images/CreateUser.PNG)
 
 2. CreateProcessAsUserW with SpoolSample trigger:
 
@@ -39,7 +39,7 @@ And trigger it via
 c:\temp\MultiPotato>MS-RPRN.exe \\192.168.100.150 \\192.168.100.150/pipe/pwned
 ```
 
-![alt text](https://raw.githubusercontent.com/S3cur3Th1sSh1t/MultiPotato/master/Images/CreateProcessAsUserW.PNG)
+![alt text](https://github.com/S3cur3Th1sSh1t/MultiPotato/raw/main/Images/CreateProcessAsUserW.PNG)
 
 Important: In my testings for MS-RPRN I could not use localhost or 127.0.0.1 as target, this has to be the network IP-Adress or FQDN. In addition the Printer Service needs to be enabled for this to work.
 
