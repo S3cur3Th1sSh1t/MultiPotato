@@ -1,7 +1,7 @@
 #pragma once
 #define TECHNIQUE_NAME L"CreateProcessWithTokenW"
 #define PIPE_NAME L"pwned/pipe/srvsvc"
-#define THREAD_TIMEOUT 30000
+#define THREAD_TIMEOUT 60000
 BOOL EnablePriv(HANDLE, LPCTSTR);
 PSID BuildEveryoneSid();
 BOOL AddTheAceDesktop(HDESK, PSID);
