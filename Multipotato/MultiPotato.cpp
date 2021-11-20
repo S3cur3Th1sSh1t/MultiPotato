@@ -110,7 +110,7 @@ void Usage()
 
 	printf("\n\n");
 	printf("Optional args: \n"
-		"-t technique: Choose from CreateUser, CresteProcessWithTokenW or CreateProcessAsUserW (default: CresteProcessWithTokenW)\n"
+		"-t technique: Choose from CreateUser, CreateProcessWithTokenW or CreateProcessAsUserW, BindShell (default: CresteProcessWithTokenW)\n"
 		"-a : arguments to run the binary with\n"
 		"-n : endless mode - restart the Named Pipe Server after execution - can be used in combination with NetNTLMv2 relaying.\n"
 	);
