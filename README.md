@@ -1,4 +1,4 @@
-# ManualPotato
+# MultiPotato
 
 First of all - credit to [@splinter_code](https://twitter.com/splinter_code) & [@decoder_it](https://twitter.com/decoder_it) for [RoguePotato](https://github.com/antonioCoco/RoguePotato) as this code heavily bases on it.
 
